@@ -8,6 +8,7 @@
 
 // valor do ângulo, alterar para o eixo a ser utilizado
 float initalAngleValue, angleY = 0;
+float sensorFlex = 0;
 
 MPU6050 mpu6050(Wire);
 
@@ -16,26 +17,34 @@ void setup() {
   Wire.begin();
   mpu6050.begin();
   mpu6050.calcGyroOffsets(false); // remove logs de calibração
-
+  
   // define pinos de saída
   pinMode(pinLedRed, OUTPUT);
   pinMode(pinLedYellow, OUTPUT);
   pinMode(pinLedGreen, OUTPUT);
+  // Inicializar sensor flexível
+ 
+  
+  //...
+  
   // Pisca led para demonstrar final da calibração
   // Envia evento para informar o final da calibração
-  tare();
+  tare(500);
+  // defini valor inicial do sensor giroscópio
   setIntialValue();
 }
 
 void loop() {
   mpu6050.update();
+  angleY = mpu6050.getAngleY()
+
+  /* TO DO
+   [] Se menor/maior (TBD) finaliza as medições
+   [] Ler o valor das coletas do sensor flexível
+   [] Criar função aritimética do valor coletado
+   [] Envia a cada 200ms o valor coletado do sensor flexível
+  */
   
-  Serial.print("angleX : ");
-  Serial.print(mpu6050.getAngleX());
-  Serial.print("\tangleY : ");
-  Serial.print(mpu6050.getAngleY());
-  Serial.print("\tangleZ : ");
-  Serial.println(mpu6050.getAngleZ());
 }
 
 void tare(int time){
@@ -50,9 +59,14 @@ void tare(int time){
  }
 
 void emmiter(char event){
-  Serial.print(event)
+  Serial.print(event);
 }
 void setIntialValue(){
     mpu6050.update();
     initalAngleValue = mpu6050.getAngleY();
 } 
+
+float calculateSensorFlex(){
+  // aqui vai alguma função matemática
+  return 3.1415;
+}
