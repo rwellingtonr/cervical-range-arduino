@@ -2,9 +2,9 @@
 #include <MPU6050_tockn.h>
 #include <Wire.h>
 // Leds
-#define pinLedRed 13
-#define pinLedYellow 12
-#define pinLedGreen 11
+#define pinLedRed 12
+#define pinLedYellow 11
+#define pinLedGreen 10
 
 // valor do ângulo, alterar para o eixo a ser utilizado
 float initalAngleValue, angleY = 0;
@@ -23,10 +23,7 @@ void setup() {
   pinMode(pinLedYellow, OUTPUT);
   pinMode(pinLedGreen, OUTPUT);
   // Inicializar sensor flexível
- 
-  
-  //...
-  
+
   // Pisca led para demonstrar final da calibração
   // Envia evento para informar o final da calibração
   tare(500);
