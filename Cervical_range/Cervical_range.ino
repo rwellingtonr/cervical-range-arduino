@@ -26,7 +26,7 @@ void setup() {
 
   // Pisca led para demonstrar final da calibração
   // Envia evento para informar o final da calibração
-  tare(500);
+  tare(1500);
   // defini valor inicial do sensor giroscópio
   setIntialValue();
 }
@@ -45,14 +45,10 @@ void loop() {
 }
 
 void tare(int time){
-  digitalWrite(pinLedRed,HIGH);
-  digitalWrite(pinLedYellow,HIGH);
-  digitalWrite(pinLedGreen,HIGH);
+  ledsON();
   delay(time);
+  ledsOFF()
   emmiter("tare");
-  digitalWrite(pinLedRed,LOW);
-  digitalWrite(pinLedYellow,HIGH);
-  digitalWrite(pinLedGreen,LOW);
  }
 
 void emmiter(char event){
@@ -66,4 +62,14 @@ void setIntialValue(){
 float calculateSensorFlex(){
   // aqui vai alguma função matemática
   return 3.1415;
+}
+void ledsON(){
+  digitalWrite(pinLedRed,HIGH);
+  digitalWrite(pinLedYellow,HIGH);
+  digitalWrite(pinLedGreen,HIGH);
+}
+void ledsOFF(){
+  digitalWrite(pinLedRed,LOW);
+  digitalWrite(pinLedYellow,HIGH);
+  digitalWrite(pinLedGreen,LOW);
 }
