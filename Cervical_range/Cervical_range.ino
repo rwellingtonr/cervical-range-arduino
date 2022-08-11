@@ -11,7 +11,7 @@
 float angleY = 0;
 float sensorFlex = 0;
 char sessionStatus;
-const int updateTime = 500;
+const int updateTime = 300;
 
 unsigned long timeControl;
 
@@ -40,10 +40,7 @@ void setup() {
 void loop() {
   mpu6050.update();
   angleY = mpu6050.getAngleY()
-  if(Serial.available()){
-    sessionStatus = Serial.readString();
-
-      // Se o valor inicial é maior que zero
+       // Se o valor inicial é maior que zero
       // começa a processar os dados
     if(sessionStatus == "started"){
 
@@ -54,19 +51,20 @@ void loop() {
         }
     }
 
+
     if(sessionStatus == "stoped"){
-
+      angleY = 0;
     }
-    
-  }
-  /* TO DO
-   [] Se menor/maior (TBD) finaliza as medições
-   [] Ler o valor das coletas do sensor flexível
-   [] Criar função aritimética do valor coletado
-   [x] Envia a cada 500ms o valor coletado do sensor flexível
-  */
-
 }
+void serialEvent(){
+  while (true){
+    if(Serial.available()){
+    sessionStatus = Serial.readString();
+    }
+  }
+}
+
+
 
 void tare(){
   blinkLED(1500); // 1,5s
@@ -90,7 +88,7 @@ void ledsOFF(){
 }
 
 void emmiter(float payload){
-  Serial.print("Value: ");
+  Serial.print("Value: "); // Value: 800
   Serial.println(payload);
 }
  
