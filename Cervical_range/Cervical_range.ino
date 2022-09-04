@@ -20,19 +20,17 @@ MPU6050 mpu6050(Wire);
 
 void setup() {
   Serial.begin(9600);
-  Serial.setTimeout(200);
+  Serial.setTimeout(300);
   Wire.begin();
   mpu6050.begin();
   // Log do estado inicial do sendor
-  mpu6050.calcGyroOffsets(true); 
+  mpu6050.calcGyroOffsets(false); 
   
   // define pinos de saída
   pinMode(pinLedRed, OUTPUT);
   pinMode(pinLedYellow, OUTPUT);
   pinMode(pinLedGreen, OUTPUT);
-  // Inicializar sensor flexível
-
-  // Pisca led para demonstrar final da calibração
+   // Pisca led para demonstrar final da calibração
   // Envia evento para informar o final da calibração
   tare();
 }
@@ -43,11 +41,12 @@ void loop() {
 
   if(Serial.available() > 0){
     sessionStatus = Serial.readString();
-    Serial.println("Received " + sessionStatus + sessionStatus.compareTo("abort"));
-    if(sessionStatus.compareTo("start") == 10){
+    blinkLED(500);
+    Serial.println("Received: " + sessionStatus);
+    if(sessionStatus.equals("start")){
       maxTimesToRepeat();
     }
-
+    
     delay(500);
   }
   if(repeated == timesToRepeat){
@@ -55,7 +54,7 @@ void loop() {
     emmitString("end");
     repeated = 0;
   }
-  if(sessionStatus.compareTo("start") == 10){    
+  if(sessionStatus.equals("start")){    
    // envia os dados a cada Xms
     if(millis() - timeControl > updateTime){
         emmiter(angleY);
@@ -94,7 +93,7 @@ void emmiter(float payload){
 }
 // Recebe uma palavra para ser enivada na porta serial
 void emmitString(String payload){
-  Serial.print(payload);
+  Serial.println(payload);
 }
  
 float calculateSensorFlex(){
