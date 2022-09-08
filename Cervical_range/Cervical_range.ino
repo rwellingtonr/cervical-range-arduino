@@ -1,5 +1,4 @@
 // Bibliotecas
-
 #include <MPU6050_tockn.h>
 #include <Wire.h>
 // LEDS
@@ -8,29 +7,37 @@
 #define pinLedGreen 10
 
 // Pre loads
-float angleY, sensorFlex = 0;
+// Constatantes
 const int updateTime = 300;
+const int analogInput = A2;
+
+// Variáveis
+float angleY, sensorFlex = 0;
+int repeated, analogValue = 0;
 int timesToRepeat = 1;
-int repeated = 0;
 String sessionStatus;
 
+// Variável de controle de atualização
 unsigned long timeControl;
 
+// Definições da biblioteca do giroscópio
 MPU6050 mpu6050(Wire);
 
 void setup() {
+  // Inicializa a porta serial
   Serial.begin(9600);
   Serial.setTimeout(300);
+  // Inicializa o giroscópio
   Wire.begin();
   mpu6050.begin();
-  // Log do estado inicial do sendor
+  // Log do estado inicial do sendor, caso verdadeiro
   mpu6050.calcGyroOffsets(false); 
   
-  // define pinos de saída
+  // Define pinos de saída
   pinMode(pinLedRed, OUTPUT);
   pinMode(pinLedYellow, OUTPUT);
   pinMode(pinLedGreen, OUTPUT);
-   // Pisca led para demonstrar final da calibração
+  // Pisca led para demonstrar final da calibração
   // Envia evento para informar o final da calibração
   tare();
 }
@@ -39,6 +46,7 @@ void loop() {
   mpu6050.update();
   angleY = mpu6050.getAngleY();
 
+  // Verifica porta analógica
   if(Serial.available() > 0){
     sessionStatus = Serial.readString();
     blinkLED(500);
@@ -46,14 +54,16 @@ void loop() {
     if(sessionStatus.equals("start")){
       maxTimesToRepeat();
     }
-    
+    // Delay para tomada de ação
     delay(500);
   }
+  // Finaliza a leitura
   if(repeated == timesToRepeat){
     sessionStatus = "end";
     emmitString("end");
     repeated = 0;
   }
+  // Verifica se deve processar as leituras
   if(sessionStatus.equals("start")){    
    // envia os dados a cada Xms
     if(millis() - timeControl > updateTime){
@@ -95,8 +105,9 @@ void emmiter(float payload){
 void emmitString(String payload){
   Serial.println(payload);
 }
- 
-float calculateSensorFlex(){
+
+// Calcula a pontuação do sensor flex
+float calculateSensorFlex(int analogValue){
   // aqui vai alguma função matemática
   return 3.1415;
 }
