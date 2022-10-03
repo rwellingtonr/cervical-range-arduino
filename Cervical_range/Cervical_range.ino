@@ -9,11 +9,9 @@
 // Pre loads
 // Constatantes
 const int updateTime = 300;
-const int analogInput = A2;
-
 // Variáveis
-float angleY, sensorFlex = 0;
-int repeated, analogValue = 0;
+float angleY = 0;
+int repeated = 0;
 int timesToRepeat = 1;
 String sessionStatus;
 
@@ -31,7 +29,7 @@ void setup() {
   Wire.begin();
   mpu6050.begin();
   // Log do estado inicial do sendor, caso verdadeiro
-  mpu6050.calcGyroOffsets(false); 
+  mpu6050.calcGyroOffsets(true); 
   
   // Define pinos de saída
   pinMode(pinLedRed, OUTPUT);
@@ -50,7 +48,7 @@ void loop() {
   if(Serial.available() > 0){
     sessionStatus = Serial.readString();
     blinkLED(500);
-    Serial.println("Received: " + sessionStatus);
+    emmitString(sessionStatus);
     if(sessionStatus.equals("start")){
       maxTimesToRepeat();
     }
@@ -106,11 +104,6 @@ void emmitString(String payload){
   Serial.println(payload);
 }
 
-// Calcula a pontuação do sensor flex
-float calculateSensorFlex(int analogValue){
-  // aqui vai alguma função matemática
-  return 3.1415;
-}
 // Retorna a quantidade de vezes que irá repetir
 // até que para e o programa
 void maxTimesToRepeat(){
