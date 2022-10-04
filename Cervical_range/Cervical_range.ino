@@ -13,7 +13,7 @@ const int updateTime = 300;
 float angleY = 0;
 int repeated = 0;
 int timesToRepeat = 1;
-String sessionStatus;
+String sessionStatus, chave;
 
 // Variável de controle de atualização
 unsigned long timeControl;
@@ -48,9 +48,17 @@ void loop() {
   if(Serial.available() > 0){
     sessionStatus = Serial.readString();
     blinkLED(500);
-    emmitString(sessionStatus);
-    if(sessionStatus.equals("start")){
+    Serial.print("aqui ");
+    Serial.println(sessionStatus);
+    chave = String(sessionStatus);
+    Serial.println(sessionStatus.compareTo("start"));
+    if(sessionStatus.compareTo("start") == 10)
+    {
+      Serial.print("aqui 2"); 
       maxTimesToRepeat();
+    }else
+    {
+      Serial.println("aqui 3");
     }
     // Delay para tomada de ação
     delay(500);
@@ -62,7 +70,8 @@ void loop() {
     repeated = 0;
   }
   // Verifica se deve processar as leituras
-  if(sessionStatus.equals("start")){    
+  if(sessionStatus.compareTo("start") == 10){  
+    //Serial.print("aqui 4");  
    // envia os dados a cada Xms
     if(millis() - timeControl > updateTime){
         emmiter(angleY);
@@ -71,7 +80,7 @@ void loop() {
     }
   }
 }
-// Função após calibrar o sensor giroscópio
+// Função após calibrar o sensor giroscópio - nessa funcao o paciente deve estar na posicao inicial da medicao. Acredito que na maioria dos casos deitada. Dai atraves de um botao no supervisorio faz o zeramento.
 void tare(){
   blinkLED(800); 
   emmitString("tare");
@@ -107,7 +116,7 @@ void emmitString(String payload){
 // Retorna a quantidade de vezes que irá repetir
 // até que para e o programa
 void maxTimesToRepeat(){
-  int tenSeconds = 10 * 1000;
+  int tenSeconds = 100 * 1000;
   float times = tenSeconds / updateTime;
   timesToRepeat = round(times);
 }
