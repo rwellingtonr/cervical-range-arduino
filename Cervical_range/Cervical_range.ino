@@ -6,14 +6,16 @@
 #define pinLedYellow 11
 #define pinLedGreen 10
 
+// I2C
+#define MPU6050_ADDR         0x68 
 // Pre loads
 // Constatantes
 const int updateTime = 300;
 // Variáveis
-float angleY = 0;
+float flexion, lateral = 0;
 int repeated = 0;
 int timesToRepeat = 1;
-String sessionStatus, chave;
+String sessionStatus;
 
 // Variável de controle de atualização
 unsigned long timeControl;
@@ -29,7 +31,7 @@ void setup() {
   Wire.begin();
   mpu6050.begin();
   // Log do estado inicial do sendor, caso verdadeiro
-  mpu6050.calcGyroOffsets(true); 
+  mpu6050.calcGyroOffsets(false); 
   
   // Define pinos de saída
   pinMode(pinLedRed, OUTPUT);
@@ -41,27 +43,24 @@ void setup() {
 }
 
 void loop() {
+  // Atualiza o giroscópio
   mpu6050.update();
-  angleY = mpu6050.getAngleY();
+  // pega os valores dos eixos X e Y
+  flexion = mpu6050.getAngleY();
+  lateral = mpu6050.getAngleX();
 
   // Verifica porta analógica
   if(Serial.available() > 0){
     sessionStatus = Serial.readString();
-    blinkLED(500);
-    Serial.print("aqui ");
+    Serial.print("Received ");
     Serial.println(sessionStatus);
-    chave = String(sessionStatus);
-    Serial.println(sessionStatus.compareTo("start"));
-    if(sessionStatus.compareTo("start") == 10)
+   // caso falhe, troque por sessionStatus.compareTo("flexion") == 0;
+    if(sessionStatus.equals("flexion") || sessionStatus.equals("lateral"))
     {
-      Serial.print("aqui 2"); 
       maxTimesToRepeat();
-    }else
-    {
-      Serial.println("aqui 3");
     }
     // Delay para tomada de ação
-    delay(500);
+    blinkLED(500);
   }
   // Finaliza a leitura
   if(repeated == timesToRepeat){
@@ -70,14 +69,22 @@ void loop() {
     repeated = 0;
   }
   // Verifica se deve processar as leituras
-  if(sessionStatus.compareTo("start") == 10){  
-    //Serial.print("aqui 4");  
+  if(sessionStatus.equals("flexion")){  
    // envia os dados a cada Xms
-    if(millis() - timeControl > updateTime){
-        emmiter(angleY);
-        timeControl = millis();
-        repeated++;
-    }
+    sendAnglePosition(flexion);
+  }
+  if(sessionStatus.equals("lateral")){
+      sendAnglePosition(lateral);
+  }
+}
+void sendAnglePosition(float angle){
+  if(millis() - timeControl > updateTime)
+  {
+    int roundedAngle = round(angle);
+    int absoluteValue = abs(roundedAngle);
+    emmiter(roundedAngle);
+    timeControl = millis();
+    repeated++;
   }
 }
 // Função após calibrar o sensor giroscópio - nessa funcao o paciente deve estar na posicao inicial da medicao. Acredito que na maioria dos casos deitada. Dai atraves de um botao no supervisorio faz o zeramento.
@@ -104,7 +111,7 @@ void ledsOFF(){
   digitalWrite(pinLedGreen,LOW);
 }
 // Recebe um número para ser enivado na porta serial
-void emmiter(float payload){
+void emmiter(int payload){
   Serial.print("Value: "); // Value: 800
   Serial.println(payload);
 }
@@ -116,7 +123,7 @@ void emmitString(String payload){
 // Retorna a quantidade de vezes que irá repetir
 // até que para e o programa
 void maxTimesToRepeat(){
-  int tenSeconds = 100 * 1000;
+  int tenSeconds = 10 * 1000;
   float times = tenSeconds / updateTime;
   timesToRepeat = round(times);
 }
