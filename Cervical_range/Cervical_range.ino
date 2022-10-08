@@ -13,7 +13,7 @@ const int updateTime = 300;
 // Variáveis
 float flexion, lateral = 0;
 String sessionStatus;
-
+int ledYellowState = LOW; 
 // Variável de controle de atualização
 unsigned long timeControl;
 
@@ -62,12 +62,15 @@ void loop() {
   if(sessionStatus.equals("lateral")){
       sendAnglePosition(lateral);
   }
+  if(sessionStatus.equals("end") || sessionStatus.equals("abort")){
+      ledsOFF();
+  }
 }
 void sendAnglePosition(float angle){
   if(millis() - timeControl > updateTime)
   {
     int roundedAngle = round(angle);
-    int absoluteValue = abs(roundedAngle);
+    switchBlink();
     emmiter(roundedAngle);
     timeControl = millis();
   }
@@ -76,6 +79,19 @@ void sendAnglePosition(float angle){
 void tare(){
   blinkLED(800); //ms
   emmitString("tare");
+}
+//Pisca o led de acordo com o estado anterior
+void switchBlink(){
+  int ledGreenState = LOW;
+  if(ledYellowState == LOW){
+    ledYellowState = HIGH;
+  }
+  else{
+    ledGreenState = HIGH;
+    ledYellowState = LOW;
+  }
+  digitalWrite(pinLedYellow,ledYellowState);
+  digitalWrite(pinLedGreen,ledGreenState);
 }
 // Pisca os leds de acordo com o delay
 void blinkLED(int time){
