@@ -59,7 +59,7 @@ void loop() {
    // envia os dados a cada Xms
     sendAnglePosition(flexion);
   }
-  if(sessionStatus.equals("lateral")){
+  if(sessionStatus.equals("lateral-left") || sessionStatus.equals("lateral-right")){
       sendAnglePosition(lateral);
   }
   if(sessionStatus.equals("end") || sessionStatus.equals("abort")){
