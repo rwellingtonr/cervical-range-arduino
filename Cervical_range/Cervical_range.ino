@@ -4,6 +4,7 @@
 // LEDS
 #define pinLedYellow 6
 #define pinLedGreen 5
+#define pinBuzzer 3
 
 // I2C
 #define MPU6050_ADDR         0x68 
@@ -24,18 +25,22 @@ void setup() {
   // Inicializa a porta serial
   Serial.begin(9600);
   Serial.setTimeout(300);
+  // Define pinos de saída
+  pinMode(pinBuzzer, OUTPUT);
+  pinMode(pinLedYellow, OUTPUT);
+  pinMode(pinLedGreen, OUTPUT);
+  // Função que informa o início da calibração
+  // Função vem aqui!!
+
   // Inicializa o giroscópio
   Wire.begin();
   mpu6050.begin();
   // Log do estado inicial do sendor, caso verdadeiro
   mpu6050.calcGyroOffsets(false); 
   
-  // Define pinos de saída
-  pinMode(pinLedYellow, OUTPUT);
-  pinMode(pinLedGreen, OUTPUT);
   // Pisca led para demonstrar final da calibração
   // Envia evento para informar o final da calibração
-  tare();
+  // tare();
 }
 
 void loop() {
@@ -117,4 +122,10 @@ void emmiter(int payload){
 // Recebe uma palavra para ser enivada na porta serial
 void emmitString(String payload){
   Serial.println(payload);
+}
+// sistema visual de calibração
+void statingTare(){
+  digitalWrite(pinLedYellow, HIGH)
+  int ms = 300
+  tone(pinBuzzer,294, ms); //RE
 }
