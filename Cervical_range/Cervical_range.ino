@@ -14,7 +14,7 @@ const int updateTime = 300;
 // Variáveis
 float flexion, lateral = 0;
 String sessionStatus;
-int ledYellowState = LOW; 
+int ledGreenStatus = LOW; 
 // Variável de controle de atualização
 unsigned long timeControl;
 
@@ -30,17 +30,17 @@ void setup() {
   pinMode(pinLedYellow, OUTPUT);
   pinMode(pinLedGreen, OUTPUT);
   // Função que informa o início da calibração
-  // Função vem aqui!!
-
+  statingTare(400);
   // Inicializa o giroscópio
   Wire.begin();
   mpu6050.begin();
   // Log do estado inicial do sendor, caso verdadeiro
   mpu6050.calcGyroOffsets(false); 
   
-  // Pisca led para demonstrar final da calibração
-  // Envia evento para informar o final da calibração
-  // tare();
+  // Informação visual que a calibração finalizou
+  endingTare(400);
+  // Informa o supervisório que a calibração acabou
+  emmitString("tare");
 }
 
 void loop() {
@@ -55,65 +55,31 @@ void loop() {
     sessionStatus = Serial.readString();
     Serial.print("Received ");
     Serial.println(sessionStatus);
-    // Delay para tomada de ação
-    blinkLED(500);
+   
   }
 
   // Verifica se deve processar as leituras
   if(sessionStatus.equals("flexion")){  
    // envia os dados a cada Xms
+    startProcess(400)
     sendAnglePosition(flexion);
   }
   if(sessionStatus.equals("lateral-left") || sessionStatus.equals("lateral-right")){
       sendAnglePosition(lateral);
   }
   if(sessionStatus.equals("end") || sessionStatus.equals("abort")){
-      ledsOFF();
+    endProcess(400)
   }
 }
 void sendAnglePosition(float angle){
   if(millis() - timeControl > updateTime)
   {
     int roundedAngle = round(angle);
-    switchBlink();
     emmiter(roundedAngle);
     timeControl = millis();
   }
 }
-// Função após calibrar o sensor giroscópio - nessa funcao o paciente deve estar na posicao inicial da medicao. Acredito que na maioria dos casos deitada. Dai atraves de um botao no supervisorio faz o zeramento.
-void tare(){
-  blinkLED(800); //ms
-  emmitString("tare");
-}
-//Pisca o led de acordo com o estado anterior
-void switchBlink(){
-  int ledGreenState = LOW;
-  if(ledYellowState == LOW){
-    ledYellowState = HIGH;
-  }
-  else{
-    ledGreenState = HIGH;
-    ledYellowState = LOW;
-  }
-  digitalWrite(pinLedYellow,ledYellowState);
-  digitalWrite(pinLedGreen,ledGreenState);
-}
-// Pisca os leds de acordo com o delay
-void blinkLED(int time){
-  ledsON();
-  delay(time);
-  ledsOFF();
-}
-// Liga os leds
-void ledsON(){
-  digitalWrite(pinLedYellow,HIGH);
-  digitalWrite(pinLedGreen,HIGH);
-}
-// Desliga os leds
-void ledsOFF(){
-    digitalWrite(pinLedYellow,LOW);
-  digitalWrite(pinLedGreen,LOW);
-}
+
 // Recebe um número para ser enivado na porta serial
 void emmiter(int payload){
   Serial.print("Value: "); // Value: 800
@@ -123,9 +89,31 @@ void emmiter(int payload){
 void emmitString(String payload){
   Serial.println(payload);
 }
-// sistema visual de calibração
-void statingTare(){
-  digitalWrite(pinLedYellow, HIGH)
-  int ms = 300
+// Sistema visual de calibração
+// Liga o led amarelo e emite um som
+void statingTare(int ms){
+  digitalWrite(pinLedYellow, HIGH);
   tone(pinBuzzer,294, ms); //RE
 }
+// Sistema visual de calibração
+// Desliga o led amarelo e emite um som
+void endingTare(int ms){
+  digitalWrite(pinLedYellow, LOW);
+  tone(pinBuzzer,294, ms); //RE
+}
+
+// Informa visualmente o inicio do processo
+void startProcess(int ms){
+  if(ledGreenStatus == LOW)
+  {
+    ledGreenStatus = HIGH;
+    digitalWrite(pinLedGreen, ledGreenStatus); 
+    tone(pinBuzzer, 294, ms); //RE
+  }
+}
+// Informa visualmente o fim do processo
+void endProcess(int ms){
+    digitalWrite(pinLedGreen, LOW); 
+    tone(pinBuzzer, 294, ms); //RE
+    delay(ms/2);
+    tone(pinBuzzer,349,ms); //FA
