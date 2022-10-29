@@ -2,8 +2,8 @@
 #include <MPU6050_tockn.h>
 #include <Wire.h>
 // LEDS
-#define pinLedYellow 6
-#define pinLedGreen 5
+#define pinLedYellow 5
+#define pinLedGreen 6
 #define pinBuzzer 3
 
 // I2C
@@ -61,14 +61,14 @@ void loop() {
   // Verifica se deve processar as leituras
   if(sessionStatus.equals("flexion")){  
    // envia os dados a cada Xms
-    startProcess(400)
+    startProcess(400);
     sendAnglePosition(flexion);
   }
   if(sessionStatus.equals("lateral-left") || sessionStatus.equals("lateral-right")){
       sendAnglePosition(lateral);
   }
   if(sessionStatus.equals("end") || sessionStatus.equals("abort")){
-    endProcess(400)
+    endProcess(400);
   }
 }
 void sendAnglePosition(float angle){
@@ -117,3 +117,4 @@ void endProcess(int ms){
     tone(pinBuzzer, 294, ms); //RE
     delay(ms/2);
     tone(pinBuzzer,349,ms); //FA
+}
