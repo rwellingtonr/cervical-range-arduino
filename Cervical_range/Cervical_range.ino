@@ -55,7 +55,6 @@ void loop() {
     sessionStatus = Serial.readString();
     Serial.print("Received ");
     Serial.println(sessionStatus);
-   
   }
 
   // Verifica se deve processar as leituras
@@ -64,13 +63,18 @@ void loop() {
     startProcess(400);
     sendAnglePosition(flexion);
   }
+
   if(sessionStatus.equals("lateral-left") || sessionStatus.equals("lateral-right")){
+      startProcess(400);
       sendAnglePosition(lateral);
   }
+
   if(sessionStatus.equals("end") || sessionStatus.equals("abort")){
-    endProcess(400);
+    sessionStatus = String(" ");
+    endProcess(600);
   }
 }
+// Envia a posição angular para o supervisório
 void sendAnglePosition(float angle){
   if(millis() - timeControl > updateTime)
   {
@@ -113,8 +117,9 @@ void startProcess(int ms){
 }
 // Informa visualmente o fim do processo
 void endProcess(int ms){
-    digitalWrite(pinLedGreen, LOW); 
-    tone(pinBuzzer, 294, ms); //RE
-    delay(ms/2);
-    tone(pinBuzzer,349,ms); //FA
+    tone(pinBuzzer, 294, ms/2); //RE
+    delay(ms);
+    ledGreenStatus = LOW;
+    digitalWrite(pinLedGreen, ledGreenStatus); 
+    tone(pinBuzzer, 294, ms * 2); //RE
 }
